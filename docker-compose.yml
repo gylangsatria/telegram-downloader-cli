@@ -10,3 +10,13 @@ services:
       - ./downloads:/downloads
       - ./session:/session
     restart: unless-stopped
+
+  telethon-login:
+    image: telegram-downloader-cli
+    container_name: telegram-downloader-login
+    volumes:
+      - ./session:/session
+      - ./:/app
+    entrypoint: ["python3", "/app/login.py"]
+    stdin_open: true
+    tty: true
