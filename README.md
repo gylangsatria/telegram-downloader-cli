@@ -2,8 +2,6 @@
 
 An automatic downloader for retrieving media from Telegram groups using a Telethon‑based user session. Designed to capture both historical and real‑time messages, supporting large file downloads, persistent sessions, and seamless integration with automated processing pipelines.
 
-> **Status:** Project is not fully functional yet. The downloader container builds successfully, but the runtime flow still requires adjustments before it can operate as intended.
-
 ---
 
 ## Features
@@ -85,7 +83,7 @@ Create .env:
 API_ID=123456
 API_HASH=your_api_hash
 SESSION_NAME=/session/downloader
-TARGET_CHAT=sfbksz
+TARGET_CHAT=your_group_media example : t.me/sfbsdsz just add >> sfbsdsz
 DOWNLOAD_DIR=/downloads
 
 ```
@@ -100,9 +98,9 @@ This project is still under development. The container builds correctly, but the
 
 ### Roadmap
 
-- Add automatic session string support
-- Improve error handling and reconnection logic
-- Add file type filtering
-- Add upload pipeline integration
-- Add rate‑limit safe history scanning
-- Add optional logging to file
+- Add automatic session string support ✅
+- Improve error handling and reconnection logic ✅
+- Add file type filtering ❌
+- Add upload pipeline integration ❌
+- Add rate‑limit safe history scanning ❌
+- Add optional logging to file ❌
