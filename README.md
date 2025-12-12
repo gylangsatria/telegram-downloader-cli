@@ -89,7 +89,13 @@ DOWNLOAD_DIR=/downloads
 ```
 
 4. Build and run the container
-``` docker compose up --build -d
+```code
+docker compose up --build -d
+```
+
+Log 
+```code
+docker logs -f telegram-downloader-cli
 ```
 
 ### Project Status
