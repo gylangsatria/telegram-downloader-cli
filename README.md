@@ -60,23 +60,7 @@ client.start()
 print("Login success")
 ```
 
-Run 
-```python
-python3 login.py
-```
-
-After login, a file named downloader.session will be created.
-
-2. Place session file into the project
-
-Move the generated session file into:
-
-```code
-session/downloader.session
-
-```
-
-3. Configure environment variables
+2. Configure environment variables
 
 Create .env:
 ```code
@@ -90,15 +74,16 @@ DOWNLOAD_DIR=/downloads
 
 4. Build and run the container
 
-Login
-```code
-docker compose run telethon-login
-```
-
 Build and run the container
 ```code
 docker compose up --build -d
 ```
+Login
+```code
+docker compose run telethon-login
+```
+After login, a file named downloader.session will be created.
+
 Watch Log 
 ```code
 docker logs -f telegram-downloader-cli
