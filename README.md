@@ -84,7 +84,7 @@ docker compose run telethon-login
 ```
 After login, a file named downloader.session will be created.
 
-Watch Log 
+Watch Log and Show progress bar
 ```code
 docker logs -f telegram-downloader-cli
 ```
@@ -116,4 +116,5 @@ This project is still under development. The container builds correctly, but the
 - Add upload pipeline integration ❌
 - Add rate‑limit safe history scanning ✅
 - Anti-duplicate download ✅
+- Add progress bar ✅
 - Add optional logging to file ❌
