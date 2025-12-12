@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  telethon-downloader:
+    build: .
+    image: telegram-downloader-cli
+    container_name: telegram-downloader-cli
+    env_file: .env
+    volumes:
+      - ./downloads:/downloads
+      - ./session:/session
+    restart: unless-stopped
