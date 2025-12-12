@@ -1,4 +1,4 @@
-# Telegram Downloader CLI (Telethon-Based)
+# Telegram Downloader CLI (Telethon-Based & Docker Ready)
 
 An automatic downloader for retrieving media from Telegram groups using a Telethon‑based user session. Designed to capture both historical and real‑time messages, supporting large file downloads, persistent sessions, and seamless integration with automated processing pipelines.
 
