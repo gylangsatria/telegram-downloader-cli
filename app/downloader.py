@@ -37,7 +37,6 @@ else:
 
 
 def calculate_checksum(file_path):
-    """Generate SHA256 checksum for a file."""
     sha256 = hashlib.sha256()
     with open(file_path, "rb") as f:
         for chunk in iter(lambda: f.read(4096), b""):
@@ -46,7 +45,6 @@ def calculate_checksum(file_path):
 
 
 def mark_downloaded(message_id, checksum):
-    """Record message_id and checksum to log files."""
     downloaded_ids.add(str(message_id))
     known_checksums.add(checksum)
 
@@ -57,36 +55,43 @@ def mark_downloaded(message_id, checksum):
         f.write(f"{checksum}\n")
 
 
-async def safe_download(message):
-    """Download media with checksum-based duplicate prevention and progress bar."""
-    # Get file size for progress bar
-    size = message.file.size if message.file else None
+# Parallel download limiter
+MAX_PARALLEL = 3
+semaphore = asyncio.Semaphore(MAX_PARALLEL)
 
-    # Create progress bar for this file
+
+async def fast_download(message):
+    """High-speed downloader using low-level API with parallel control."""
+    if not message.media or not message.file:
+        return None
+
+    file_name = message.file.name or f"{message.id}"
+    file_path = os.path.join(download_dir, file_name)
+    total_size = message.file.size
+
     pbar = tqdm(
-        total=size,
+        total=total_size,
         unit="B",
         unit_scale=True,
-        desc=f"Downloading {message.id}",
+        desc=f"Downloading {file_name}",
         leave=False
     )
 
-    # Custom progress callback
-    def progress_callback(current, total):
+    async def progress_callback(current, total):
         pbar.total = total
         pbar.n = current
         pbar.refresh()
 
-    # Download file
-    file_path = await message.download_media(
-        download_dir,
-        progress_callback=progress_callback
-    )
-
-    pbar.close()
-
-    if not file_path:
-        return None
+    async with semaphore:
+        try:
+            await client.download_file(
+                message.media.document,
+                file_path,
+                part_size_kb=1024,  # 1 MB chunks
+                progress_callback=progress_callback
+            )
+        finally:
+            pbar.close()
 
     checksum = calculate_checksum(file_path)
 
@@ -99,77 +104,66 @@ async def safe_download(message):
 
 
 async def download_history():
-    """Download full history with progress bar and rate-limit safety."""
     print("Starting full history download...")
 
-    # Count total messages for progress bar
     total_messages = await client.get_messages(target_chat, limit=0)
     total_count = total_messages.total
 
     pbar = tqdm(total=total_count, desc="History scanning", unit="msg")
 
+    tasks = []
+
     async for message in client.iter_messages(target_chat, limit=None):
-        await asyncio.sleep(0.5)
         pbar.update(1)
 
         if str(message.id) in downloaded_ids:
             continue
 
         if message.media:
-            try:
-                file_path = await safe_download(message)
-                if file_path:
-                    print(f"History downloaded: {file_path}")
-
-            except FloodWaitError as fw:
-                print(f"FloodWait detected: waiting {fw.seconds} seconds...")
-                await asyncio.sleep(fw.seconds)
-
+            async def task_wrapper(msg=message):
                 try:
-                    file_path = await safe_download(message)
+                    file_path = await fast_download(msg)
                     if file_path:
-                        print(f"History downloaded after wait: {file_path}")
+                        print(f"Downloaded: {file_path}")
+                except FloodWaitError as fw:
+                    print(f"FloodWait: waiting {fw.seconds}s...")
+                    await asyncio.sleep(fw.seconds)
+                    await fast_download(msg)
                 except Exception as e:
-                    print(f"Failed after FloodWait retry: {e}")
+                    print(f"Error: {e}")
 
-            except Exception as e:
-                print(f"Failed history download: {e}")
+            tasks.append(asyncio.create_task(task_wrapper()))
+
+    await asyncio.gather(*tasks)
 
     pbar.close()
-    print("All history processed.")
+    print("History download complete.")
 
 
 @client.on(events.NewMessage(chats=target_chat))
 async def handler(event):
-    """Handle new incoming messages with duplicate prevention."""
     message = event.message
 
     if str(message.id) in downloaded_ids:
         return
 
     if message.media:
-        try:
-            file_path = await safe_download(message)
-            if file_path:
-                print(f"New media downloaded: {file_path}")
-
-        except FloodWaitError as fw:
-            print(f"FloodWait on new message: waiting {fw.seconds} seconds...")
-            await asyncio.sleep(fw.seconds)
-
+        async def new_msg_task():
             try:
-                file_path = await safe_download(message)
+                file_path = await fast_download(message)
                 if file_path:
-                    print(f"New media downloaded after wait: {file_path}")
+                    print(f"New media downloaded: {file_path}")
+            except FloodWaitError as fw:
+                print(f"FloodWait new msg: waiting {fw.seconds}s...")
+                await asyncio.sleep(fw.seconds)
+                await fast_download(message)
             except Exception as e:
-                print(f"Failed new media retry: {e}")
+                print(f"New message error: {e}")
 
-        except Exception as e:
-            print(f"Failed new media download: {e}")
+        asyncio.create_task(new_msg_task())
 
 
 async def main():
-    """Start client, run history download, and listen for new messages."""
     await client.start()
     print("Telethon downloader is running...")
 
