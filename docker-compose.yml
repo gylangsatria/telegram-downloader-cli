@@ -20,3 +20,4 @@ services:
     entrypoint: ["python3", "/app/login.py"]
     stdin_open: true
     tty: true
+
