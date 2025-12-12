@@ -89,11 +89,17 @@ DOWNLOAD_DIR=/downloads
 ```
 
 4. Build and run the container
+
+Login
+```code
+docker compose run telethon-login
+```
+
+Build and run the container
 ```code
 docker compose up --build -d
 ```
-
-Log 
+Watch Log 
 ```code
 docker logs -f telegram-downloader-cli
 ```
