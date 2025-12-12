@@ -4,6 +4,7 @@ import hashlib
 from telethon import TelegramClient, events
 from telethon.errors import FloodWaitError
 from dotenv import load_dotenv
+from tqdm import tqdm
 
 load_dotenv()
 
@@ -57,8 +58,33 @@ def mark_downloaded(message_id, checksum):
 
 
 async def safe_download(message):
-    """Download media with checksum-based duplicate prevention."""
-    file_path = await message.download_media(download_dir)
+    """Download media with checksum-based duplicate prevention and progress bar."""
+    # Get file size for progress bar
+    size = message.file.size if message.file else None
+
+    # Create progress bar for this file
+    pbar = tqdm(
+        total=size,
+        unit="B",
+        unit_scale=True,
+        desc=f"Downloading {message.id}",
+        leave=False
+    )
+
+    # Custom progress callback
+    def progress_callback(current, total):
+        pbar.total = total
+        pbar.n = current
+        pbar.refresh()
+
+    # Download file
+    file_path = await message.download_media(
+        download_dir,
+        progress_callback=progress_callback
+    )
+
+    pbar.close()
+
     if not file_path:
         return None
 
@@ -73,11 +99,18 @@ async def safe_download(message):
 
 
 async def download_history():
-    """Download full history with rate-limit safety and duplicate prevention."""
+    """Download full history with progress bar and rate-limit safety."""
     print("Starting full history download...")
+
+    # Count total messages for progress bar
+    total_messages = await client.get_messages(target_chat, limit=0)
+    total_count = total_messages.total
+
+    pbar = tqdm(total=total_count, desc="History scanning", unit="msg")
 
     async for message in client.iter_messages(target_chat, limit=None):
         await asyncio.sleep(0.5)
+        pbar.update(1)
 
         if str(message.id) in downloaded_ids:
             continue
@@ -102,6 +135,7 @@ async def download_history():
             except Exception as e:
                 print(f"Failed history download: {e}")
 
+    pbar.close()
     print("All history processed.")
 
 
