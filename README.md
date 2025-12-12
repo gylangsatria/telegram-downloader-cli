@@ -114,5 +114,6 @@ This project is still under development. The container builds correctly, but the
 - Improve error handling and reconnection logic ✅
 - Add file type filtering ❌
 - Add upload pipeline integration ❌
-- Add rate‑limit safe history scanning ❌
+- Add rate‑limit safe history scanning ✅
+- Anti-duplicate download ✅
 - Add optional logging to file ❌
