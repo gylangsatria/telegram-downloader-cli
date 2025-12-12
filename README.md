@@ -89,6 +89,21 @@ Watch Log
 docker logs -f telegram-downloader-cli
 ```
 
+### Project File & Folder Overview
+
+| Item | Type | Function |
+|------|------|----------|
+| **app/** | Folder | Contains the main Python scripts (`downloader.py`). |
+| **downloads/** | Folder | Contains the main downloaded files |
+| **session/** | Folder | Stores the Telethon session file (`downloader.session`) used for persistent login. |
+| **.gitignore** | File | Specifies files/folders ignored by Git (e.g., `__pycache__/`, `*.session`, `downloads/`). |
+| **Dockerfile** | File | Instructions for building the Docker image: install Python, Telethon, copy scripts. |
+| **README.md** | File | Project documentation (usage guide, structure explanation, setup instructions). |
+| **docker-compose.yml** | File | Defines container orchestration: login service, downloader service, volume mounts. |
+| **login.py** | File | Script used for initial Telegram login and generating the session file. |
+| **requirements.txt** | File | Python dependencies list (Telethon, python-dotenv, etc.). |
+
+
 ### Project Status
 
 This project is still under development. The container builds correctly, but the downloader logic and session handling require further refinement before it becomes fully operational.
