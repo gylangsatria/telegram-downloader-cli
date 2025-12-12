@@ -110,11 +110,20 @@ This project is still under development. The container builds correctly, but the
 
 ### Roadmap
 
-- Add automatic session string support ✅
+- Add automatic session string support ❌
 - Improve error handling and reconnection logic ✅
 - Add file type filtering ❌
 - Add upload pipeline integration ❌
 - Add rate‑limit safe history scanning ✅
 - Anti-duplicate download ✅
 - Add progress bar ✅
+- Add Chunk & Pararell Download ✅
 - Add optional logging to file ❌
+
+
+
+Next : 
+
+Auto reconnect jika koneksi putus
+Auto restart task jika gagal
+Exception grouping untuk network error
