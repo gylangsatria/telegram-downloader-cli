@@ -34,33 +34,7 @@ An automatic downloader for retrieving media from Telegram groups using a Teleth
 
 ## Setup Instructions
 
-### 1. Generate Telethon session on host
-
-Create a file named `login.py`:
-
-```python
-from telethon import TelegramClient
-
-api_id = 123456
-api_hash = "your_api_hash"
-
-client = TelegramClient("downloader", api_id, api_hash)
-client.start()
-print("Login success")
-
-
-```python
-from telethon import TelegramClient
-
-api_id = 123456
-api_hash = "your_api_hash"
-
-client = TelegramClient("downloader", api_id, api_hash)
-client.start()
-print("Login success")
-```
-
-2. Configure environment variables
+### 1. Configure environment variables
 
 Create .env:
 ```code
@@ -72,7 +46,7 @@ DOWNLOAD_DIR=/downloads
 
 ```
 
-4. Build and run the container
+### 2. Build and run the container
 
 Build and run the container
 ```code
