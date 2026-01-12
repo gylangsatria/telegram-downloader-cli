@@ -56,7 +56,7 @@ Login
 ```code
 docker compose run telethon-login
 ```
-After login, a file named downloader.session will be created.
+After login, a file named downloader.session will be created and build and run the container again
 
 Watch Log and Show progress bar
 ```code
